@@ -1,117 +1,135 @@
-// ========== JOGO AGRO FORTE - SISTEMA COMPLETO ==========
+// ========== JOGO COMPLETO COM PERSONAGENS E MOVIMENTO ==========
 
-// ESTADO DO JOGO
+// VARIÁVEIS GLOBAIS
+let playerName = "";
+let selectedChar = "boy"; // 'boy' ou 'girl'
 let gameState = {
     producao: 500,
     ambiente: 500,
     dinheiro: 5000,
     dia: 1,
     pontuacao: 0,
-    historico: [],
-    jogoAtivo: true
+    jogoAtivo: true,
+    posX: 2,  // posição no mapa (0-4)
+    posY: 2
 };
 
-// LIMITES DO JOGO
-const MAX_STAT = 1000;
-const MIN_STAT = 0;
-const DIAS_PARA_VENCER = 30;
-const PONTUACAO_VITORIA = 1000;
+// DEFINIÇÃO DO MAPA (cada célula tem um tipo)
+const mapa = [
+    ["farm", "farm", "forest", "farm", "river"],
+    ["farm", "forest", "farm", "market", "farm"],
+    ["forest", "farm", "farm", "farm", "forest"],
+    ["river", "farm", "market", "forest", "farm"],
+    ["farm", "forest", "river", "farm", "farm"]
+];
 
-// AÇÕES E SEUS EFEITOS
-const acoes = {
-    plantioDireto: {
-        nome: "🌾 Plantio Direto",
-        producao: 30,
-        ambiente: 20,
-        dinheiro: -50,
-        descricao: "Técnica sustentável que melhora o solo"
+// TIPOS DE ÁREA e suas ações
+const areas = {
+    farm: {
+        nome: "🌾 PLANTação",
+        desc: "Área de cultivo! Plante e colha alimentos.",
+        acoes: [
+            { id: "plantioDireto", nome: "🌾 Plantio Direto", efeito: { prod: 30, amb: 20, din: -50 }, fala: "Plantio direto protege o solo, {nome}!" },
+            { id: "colher", nome: "💰 Colher Safra", efeito: { prod: -20, amb: 5, din: 150 }, fala: "Boa colheita, {nome}! Lucro garantido!" }
+        ]
     },
-    desmatamento: {
-        nome: "🪓 Desmatamento",
-        producao: 50,
-        ambiente: -60,
-        dinheiro: 200,
-        descricao: "Expansão rápida mas agride o ambiente"
+    forest: {
+        nome: "🌳 FLORESTA",
+        desc: "Área de preservação ambiental.",
+        acoes: [
+            { id: "reflorestamento", nome: "🌱 Reflorestar", efeito: { prod: -10, amb: 40, din: -100 }, fala: "Cada árvore plantada é vida, {nome}!" },
+            { id: "extrativismo", nome: "🪵 Extrativismo", efeito: { prod: 10, amb: -30, din: 100 }, fala: "Cuidado {nome}! Explorar demais prejudica a natureza." }
+        ]
     },
-    reflorestamento: {
-        nome: "🌳 Reflorestamento",
-        producao: -20,
-        ambiente: 50,
-        dinheiro: -150,
-        descricao: "Planta árvores e recupera ecossistemas"
+    river: {
+        nome: "💧 RIO",
+        desc: "Fonte de água para irrigação.",
+        acoes: [
+            { id: "irrigacao", nome: "💧 Irrigação Sustentável", efeito: { prod: 25, amb: 10, din: -80 }, fala: "Água é vida, {nome}! Use com sabedoria." },
+            { id: "pesca", nome: "🎣 Pesca Responsável", efeito: { prod: 5, amb: -5, din: 60 }, fala: "Pescar é bom, mas sem exageros {nome}!" }
+        ]
     },
-    tecnologiaVerde: {
-        nome: "💡 Tecnologia Verde",
-        producao: 40,
-        ambiente: 35,
-        dinheiro: -200,
-        descricao: "Investe em energia limpa e bioinsumos"
-    },
-    agrotoxico: {
-        nome: "🧪 Agrotóxico",
-        producao: 45,
-        ambiente: -40,
-        dinheiro: 100,
-        descricao: "Aumenta produção mas polui o solo"
-    },
-    feiraOrganica: {
-        nome: "🛒 Feira Orgânica",
-        producao: -15,
-        ambiente: 30,
-        dinheiro: 180,
-        descricao: "Produtos orgânicos valorizam a marca"
+    market: {
+        nome: "🏪 FEIRA LIVRE",
+        desc: "Venda seus produtos orgânicos!",
+        acoes: [
+            { id: "venderOrg", nome: "🛒 Vender Orgânicos", efeito: { prod: -15, amb: 5, din: 200 }, fala: "Orgânicos valem mais, {nome}! Boa venda!" },
+            { id: "comprarInsumo", nome: "📦 Comprar Insumo", efeito: { prod: 20, amb: -5, din: -120 }, fala: "Insumos de qualidade melhoram a produção, {nome}!" }
+        ]
     }
+};
+
+// AÇÕES GLOBAIS (efeitos padrão)
+const acoesGlobais = {
+    plantioDireto: { prod: 30, amb: 20, din: -50, nome: "Plantio Direto" },
+    colher: { prod: -20, amb: 5, din: 150, nome: "Colher Safra" },
+    reflorestamento: { prod: -10, amb: 40, din: -100, nome: "Reflorestamento" },
+    extrativismo: { prod: 10, amb: -30, din: 100, nome: "Extrativismo" },
+    irrigacao: { prod: 25, amb: 10, din: -80, nome: "Irrigação" },
+    pesca: { prod: 5, amb: -5, din: 60, nome: "Pesca" },
+    venderOrg: { prod: -15, amb: 5, din: 200, nome: "Venda Orgânicos" },
+    comprarInsumo: { prod: 20, amb: -5, din: -120, nome: "Comprar Insumo" }
 };
 
 // EVENTOS ALEATÓRIOS
 const eventosAleatorios = [
-    {
-        nome: "🌧️ Chuva Abundante",
-        efeito: { producao: 40, ambiente: 10, dinheiro: 0 },
-        mensagem: "As chuvas ajudaram suas plantações!"
-    },
-    {
-        nome: "🔥 Estiagem Severa",
-        efeito: { producao: -50, ambiente: -20, dinheiro: -300 },
-        mensagem: "A seca prejudicou sua produção e gerou prejuízos!"
-    },
-    {
-        nome: "📈 Preços Elevados",
-        efeito: { producao: 0, ambiente: 0, dinheiro: 400 },
-        mensagem: "Os preços dos grãos dispararam no mercado!"
-    },
-    {
-        nome: "🐛 Praga na Lavoura",
-        efeito: { producao: -60, ambiente: -10, dinheiro: -200 },
-        mensagem: "Uma praga atingiu parte da sua plantação!"
-    },
-    {
-        nome: "🏆 Prêmio Sustentável",
-        efeito: { producao: 20, ambiente: 40, dinheiro: 500 },
-        mensagem: "Você ganhou um prêmio por práticas sustentáveis!"
-    },
-    {
-        nome: "🤝 Parceria Internacional",
-        efeito: { producao: 30, ambiente: 20, dinheiro: 600 },
-        mensagem: "Nova parceria trouxe investimentos verdes!"
-    }
+    { nome: "🌧️ Chuva Forte", efeito: { prod: 30, amb: 10, din: 0 }, fala: "A chuva abençoou nossas plantações, {nome}!" },
+    { nome: "🔥 Seca", efeito: { prod: -40, amb: -15, din: -200 }, fala: "Estiagem chegou, {nome}. Precisamos de reservas!" },
+    { nome: "📈 Preços Altos", efeito: { prod: 0, amb: 0, din: 300 }, fala: "Preços dispararam, {nome}! Hora de vender!" },
+    { nome: "🐛 Praga", efeito: { prod: -50, amb: -10, din: -150 }, fala: "Praga na lavoura, {nome}! Use controle biológico!" },
+    { nome: "🏆 Prêmio Verde", efeito: { prod: 15, amb: 30, din: 400 }, fala: "Parabéns {nome}! Prêmio por sustentabilidade!" }
 ];
 
 // DOM Elements
-let startScreen, gameScreen, gameOverScreen, winScreen;
+let charSprite, charNameDisplay, playerNameTag, talkAvatar;
 let prodValue, envValue, moneyValue, dayCounter, scoreValue;
-let prodFill, envFill, moneyFill;
-let eventMessage, historyList;
+let eventMessageSpan, historyList, characterSpeech;
+let posXSpan, posYSpan;
 
-// FUNÇÃO PARA ATUALIZAR INTERFACE
+// ========== FUNÇÕES DO PERSONAGEM ==========
+function setCharacter(char) {
+    selectedChar = char;
+    if (char === "boy") {
+        charSprite.innerHTML = "👨‍🌾";
+        charNameDisplay.innerHTML = "Lucas";
+        talkAvatar.innerHTML = "👨‍🌾";
+        document.getElementById("gameOverChar").innerHTML = "👨‍🌾";
+        document.getElementById("winChar").innerHTML = "👨‍🌾";
+    } else {
+        charSprite.innerHTML = "👩‍🌾";
+        charNameDisplay.innerHTML = "Sofia";
+        talkAvatar.innerHTML = "👩‍🌾";
+        document.getElementById("gameOverChar").innerHTML = "👩‍🌾";
+        document.getElementById("winChar").innerHTML = "👩‍🌾";
+    }
+}
+
+function characterSpeak(message, isEvento = false) {
+    let finalMsg = message.replace(/\{nome\}/g, playerName);
+    if (!isEvento && playerName) {
+        // Adiciona nome naturalmente em algumas falas
+        if (Math.random() > 0.6 && !finalMsg.includes(playerName)) {
+            const prefixos = [`${playerName}, `, `E aí ${playerName}! `, `Olha só ${playerName}, `];
+            finalMsg = prefixos[Math.floor(Math.random() * prefixos.length)] + finalMsg.toLowerCase();
+        }
+    }
+    characterSpeech.innerHTML = finalMsg;
+    
+    // Animação
+    const bubble = document.querySelector('.talk-bubble');
+    bubble.style.transform = 'scale(1.02)';
+    setTimeout(() => bubble.style.transform = 'scale(1)', 200);
+}
+
+// ========== FUNÇÕES DO JOGO ==========
 function atualizarInterface() {
-    // Atualiza valores numéricos
     prodValue.textContent = Math.floor(gameState.producao);
     envValue.textContent = Math.floor(gameState.ambiente);
     moneyValue.textContent = Math.floor(gameState.dinheiro);
     dayCounter.textContent = gameState.dia;
+    playerNameTag.textContent = playerName;
     
-    // Calcula pontuação (média ponderada)
+    // Pontuação
     gameState.pontuacao = Math.floor(
         (gameState.producao * 0.3) + 
         (gameState.ambiente * 0.5) + 
@@ -119,149 +137,141 @@ function atualizarInterface() {
     );
     scoreValue.textContent = gameState.pontuacao;
     
-    // Atualiza barras de progresso (porcentagem)
-    let prodPercent = (gameState.producao / MAX_STAT) * 100;
-    let envPercent = (gameState.ambiente / MAX_STAT) * 100;
-    let moneyPercent = (gameState.dinheiro / 10000) * 100;
-    
-    prodFill.style.width = Math.min(prodPercent, 100) + "%";
-    envFill.style.width = Math.min(envPercent, 100) + "%";
-    moneyFill.style.width = Math.min(moneyPercent, 100) + "%";
-    
-    // Altera cor das barras se estiverem críticas
-    if (gameState.producao < 200) prodFill.style.background = "#f44336";
-    else if (gameState.producao < 400) prodFill.style.background = "#ff9800";
-    else prodFill.style.background = "linear-gradient(90deg, #ffd700, #ff9800)";
-    
-    if (gameState.ambiente < 200) envFill.style.background = "#f44336";
-    else if (gameState.ambiente < 400) envFill.style.background = "#ff9800";
-    else envFill.style.background = "linear-gradient(90deg, #4caf50, #2e7d32)";
-    
-    if (gameState.dinheiro < 1000) moneyFill.style.background = "#f44336";
-    else if (gameState.dinheiro < 2500) moneyFill.style.background = "#ff9800";
-    else moneyFill.style.background = "linear-gradient(90deg, #2196f3, #1976d2)";
+    // Verifica condições críticas
+    if (gameState.ambiente < 200) characterSpeak("Cuidado {nome}! O meio ambiente está em perigo! 🌍⚠️");
+    if (gameState.dinheiro < 1000) characterSpeak("{nome}, nosso dinheiro está acabando! 💰⚠️");
+    if (gameState.producao < 200) characterSpeak("{nome}, a produção está baixa! Vamos agir! 🌽⚠️");
 }
 
-// FUNÇÃO PARA ADICIONAR AO HISTÓRICO
-function adicionarHistorico(acaoNome, efeitos, eventoAleatorio = false) {
-    let cor = "";
-    let sinal = "";
-    let totalEfeito = (efeitos.producao || 0) + (efeitos.ambiente || 0) + (efeitos.dinheiro || 0);
-    
-    if (totalEfeito > 0) {
-        cor = "positive";
-        sinal = "✅";
-    } else if (totalEfeito < 0) {
-        cor = "negative";
-        sinal = "⚠️";
-    } else {
-        sinal = "ℹ️";
-    }
-    
+function adicionarHistorico(texto) {
     const item = document.createElement("div");
-    item.className = `history-item ${cor}`;
-    item.innerHTML = `<strong>Dia ${gameState.dia}:</strong> ${sinal} ${acaoNome}<br>
-                      <small>🌽${efeitos.producao !== 0 ? (efeitos.producao > 0 ? `+${efeitos.producao}` : efeitos.producao) : ''}
-                      🌳${efeitos.ambiente !== 0 ? (efeitos.ambiente > 0 ? `+${efeitos.ambiente}` : efeitos.ambiente) : ''}
-                      💰${efeitos.dinheiro !== 0 ? (efeitos.dinheiro > 0 ? `+${efeitos.dinheiro}` : efeitos.dinheiro) : ''}</small>`;
-    
+    item.className = "history-item";
+    item.innerHTML = `📅 Dia ${gameState.dia}: ${texto}`;
     historyList.insertBefore(item, historyList.firstChild);
-    
-    // Limita histórico a 15 itens
-    while (historyList.children.length > 15) {
+    while (historyList.children.length > 12) {
         historyList.removeChild(historyList.lastChild);
     }
 }
 
-// FUNÇÃO PARA APLICAR EFEITOS
-function aplicarEfeitos(efeitos, acaoNome, isEvento = false) {
-    // Aplica os efeitos
-    gameState.producao = Math.min(MAX_STAT, Math.max(MIN_STAT, gameState.producao + (efeitos.producao || 0)));
-    gameState.ambiente = Math.min(MAX_STAT, Math.max(MIN_STAT, gameState.ambiente + (efeitos.ambiente || 0)));
-    gameState.dinheiro = Math.min(20000, Math.max(MIN_STAT, gameState.dinheiro + (efeitos.dinheiro || 0)));
+function aplicarEfeitos(efeitos, acaoNome) {
+    gameState.producao = Math.min(1000, Math.max(0, gameState.producao + (efeitos.prod || 0)));
+    gameState.ambiente = Math.min(1000, Math.max(0, gameState.ambiente + (efeitos.amb || 0)));
+    gameState.dinheiro = Math.min(20000, Math.max(0, gameState.dinheiro + (efeitos.din || 0)));
     
-    // Atualiza interface
     atualizarInterface();
-    
-    // Adiciona ao histórico
-    adicionarHistorico(acaoNome, efeitos, isEvento);
-    
-    // Mostra mensagem temporária
-    let msg = acaoNome;
-    if (efeitos.producao !== 0) msg += ` | 🌽 ${efeitos.producao > 0 ? '+' : ''}${efeitos.producao}`;
-    if (efeitos.ambiente !== 0) msg += ` | 🌳 ${efeitos.ambiente > 0 ? '+' : ''}${efeitos.ambiente}`;
-    if (efeitos.dinheiro !== 0) msg += ` | 💰 ${efeitos.dinheiro > 0 ? '+' : ''}${efeitos.dinheiro}`;
-    
-    eventMessage.innerHTML = `✨ ${msg} ✨`;
-    eventMessage.style.animation = "none";
-    setTimeout(() => { eventMessage.style.animation = "pulse 2s infinite"; }, 10);
+    adicionarHistorico(`${acaoNome}: 🌽${efeitos.prod || 0} 🌳${efeitos.amb || 0} 💰${efeitos.din || 0}`);
     
     // Verifica game over
-    verificarGameOver();
+    if (gameState.ambiente <= 0) gameOver("❌ O MEIO AMBIENTE FOI DESTRUÍDO!");
+    else if (gameState.dinheiro <= 0) gameOver("💰 VOCÊ FALIU!");
+    else if (gameState.producao <= 0) gameOver("🌾 PRODUÇÃO ZERADA!");
 }
 
-// FUNÇÃO PARA EVENTO ALEATÓRIO
 function triggerEventoAleatorio() {
-    if (Math.random() < 0.4) { // 40% de chance de evento
+    if (Math.random() < 0.35 && gameState.jogoAtivo) {
         const evento = eventosAleatorios[Math.floor(Math.random() * eventosAleatorios.length)];
-        eventMessage.innerHTML = `🎲 EVENTO: ${evento.nome} - ${evento.mensagem}`;
-        aplicarEfeitos(evento.efeito, `🎲 ${evento.nome}`, true);
+        aplicarEfeitos(evento.efeito, `🎲 EVENTO: ${evento.nome}`);
+        characterSpeak(evento.fala, true);
+        eventMessageSpan.innerHTML = `🎲 ${evento.nome}: ${evento.efeito.prod ? `🌽${evento.efeito.prod}` : ''} ${evento.efeito.amb ? `🌳${evento.efeito.amb}` : ''} ${evento.efeito.din ? `💰${evento.efeito.din}` : ''}`;
         return true;
     }
     return false;
 }
 
-// FUNÇÃO PARA AVANÇAR DIA
 function avancarDia() {
     gameState.dia++;
     atualizarInterface();
     
-    // Verifica vitória
-    if (gameState.dia > DIAS_PARA_VENCER && gameState.pontuacao >= PONTUACAO_VITORIA) {
+    if (gameState.dia > 30 && gameState.pontuacao >= 1000) {
         vitoria();
-        return;
+    } else if (gameState.dia > 30) {
+        gameOver("Tempo esgotado! Pontuação insuficiente.");
+    } else {
+        triggerEventoAleatorio();
+        characterSpeak("Novo dia, {nome}! O que vamos fazer agora? 🌞");
     }
-    
-    if (gameState.dia > DIAS_PARA_VENCER) {
-        gameOver("Tempo esgotado! Você não atingiu a pontuação necessária.");
-        return;
-    }
-    
-    // Evento aleatório do dia
-    triggerEventoAleatorio();
 }
 
-// FUNÇÃO PARA EXECUTAR AÇÃO
-function executarAcao(acaoId) {
+// ========== MOVIMENTO NO MAPA ==========
+function desenharMapa() {
+    const grid = document.getElementById("mapGrid");
+    grid.innerHTML = "";
+    
+    for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+            const cell = document.createElement("div");
+            cell.className = "map-cell";
+            
+            // Ícone do tipo de terreno
+            const tipo = mapa[y][x];
+            if (tipo === "farm") cell.innerHTML = "🌾";
+            else if (tipo === "forest") cell.innerHTML = "🌳";
+            else if (tipo === "river") cell.innerHTML = "💧";
+            else if (tipo === "market") cell.innerHTML = "🏪";
+            
+            // Destaca posição do jogador
+            if (x === gameState.posX && y === gameState.posY) {
+                cell.classList.add("player-cell");
+                cell.innerHTML = selectedChar === "boy" ? "👨‍🌾" : "👩‍🌾";
+            }
+            
+            grid.appendChild(cell);
+        }
+    }
+    
+    posXSpan.textContent = gameState.posX;
+    posYSpan.textContent = gameState.posY;
+    
+    // Atualiza painel de ação conforme a área
+    const tipoAtual = mapa[gameState.posY][gameState.posX];
+    const area = areas[tipoAtual];
+    document.getElementById("areaTitle").innerHTML = `📍 ${area.nome}`;
+    document.getElementById("areaDesc").innerHTML = area.desc;
+    
+    const actionsDiv = document.getElementById("areaActions");
+    actionsDiv.innerHTML = "";
+    area.acoes.forEach(acao => {
+        const btn = document.createElement("button");
+        btn.className = "action-btn";
+        btn.innerHTML = acao.nome;
+        btn.onclick = () => executarAcaoLocal(acao.id, acao.nome, acao.efeito, acao.fala);
+        actionsDiv.appendChild(btn);
+    });
+}
+
+function mover(dx, dy) {
     if (!gameState.jogoAtivo) return;
     
-    const acao = acoes[acaoId];
-    if (!acao) return;
+    const novaX = gameState.posX + dx;
+    const novaY = gameState.posY + dy;
     
-    // Aplica os efeitos da ação
-    aplicarEfeitos(
-        { producao: acao.producao, ambiente: acao.ambiente, dinheiro: acao.dinheiro },
-        acao.nome
-    );
+    if (novaX >= 0 && novaX < 5 && novaY >= 0 && novaY < 5) {
+        gameState.posX = novaX;
+        gameState.posY = novaY;
+        desenharMapa();
+        
+        const tipo = mapa[novaY][novaX];
+        const area = areas[tipo];
+        characterSpeak(`Fui para ${area.nome}. ${area.desc}`);
+        eventMessageSpan.innerHTML = `🚶 Você andou até ${area.nome}`;
+    } else {
+        characterSpeak("Não dá pra sair da fazenda, {nome}! Vire para outro lado.");
+    }
+}
+
+function executarAcaoLocal(acaoId, acaoNome, efeito, falaMsg) {
+    if (!gameState.jogoAtivo) return;
     
-    // Avança para o próximo dia se o jogo ainda estiver ativo
+    aplicarEfeitos(efeito, acaoNome);
+    characterSpeak(falaMsg);
+    eventMessageSpan.innerHTML = `✅ ${acaoNome} realizado!`;
+    
     if (gameState.jogoAtivo) {
         avancarDia();
     }
 }
 
-// FUNÇÃO PARA VERIFICAR GAME OVER
-function verificarGameOver() {
-    if (gameState.ambiente <= 0) {
-        gameOver("❌ O MEIO AMBIENTE FOI DESTRUÍDO! ❌ Suas práticas insustentáveis levaram ao colapso ecológico.");
-    } else if (gameState.dinheiro <= 0) {
-        gameOver("💰 VOCÊ FALIU! 💰 A falta de recursos financeiros quebrou sua fazenda.");
-    } else if (gameState.producao <= 0) {
-        gameOver("🌾 PRODUÇÃO ZERADA! 🌾 Sua terra não produz mais nada.");
-    }
-}
-
-// FUNÇÃO GAME OVER
+// ========== TELAS DE FIM ==========
 function gameOver(mensagem) {
     gameState.jogoAtivo = false;
     document.getElementById("gameOverMessage").textContent = mensagem;
@@ -270,11 +280,10 @@ function gameOver(mensagem) {
     document.getElementById("finalMoney").textContent = Math.floor(gameState.dinheiro);
     document.getElementById("finalScore").textContent = gameState.pontuacao;
     
-    gameScreen.classList.remove("active");
-    gameOverScreen.classList.add("active");
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("gameOverScreen").classList.add("active");
 }
 
-// FUNÇÃO VITÓRIA
 function vitoria() {
     gameState.jogoAtivo = false;
     document.getElementById("winProd").textContent = Math.floor(gameState.producao);
@@ -282,11 +291,12 @@ function vitoria() {
     document.getElementById("winMoney").textContent = Math.floor(gameState.dinheiro);
     document.getElementById("winScore").textContent = gameState.pontuacao;
     
-    gameScreen.classList.remove("active");
-    winScreen.classList.add("active");
+    characterSpeak(`PARABÉNS {nome}! Você é um HERÓI da sustentabilidade! 🏆🌱`);
+    
+    document.getElementById("gameScreen").classList.remove("active");
+    document.getElementById("winScreen").classList.add("active");
 }
 
-// FUNÇÃO REINICIAR JOGO
 function reiniciarJogo() {
     gameState = {
         producao: 500,
@@ -294,66 +304,89 @@ function reiniciarJogo() {
         dinheiro: 5000,
         dia: 1,
         pontuacao: 0,
-        historico: [],
-        jogoAtivo: true
+        jogoAtivo: true,
+        posX: 2,
+        posY: 2
     };
     
-    // Limpa histórico visual
-    historyList.innerHTML = "<p>✨ Nenhuma ação ainda. Comece a jogar!</p>";
-    
-    // Atualiza interface
+    historyList.innerHTML = "";
     atualizarInterface();
+    desenharMapa();
+    characterSpeak("Vamos recomeçar, {nome}! O futuro sustentável depende de nós! 🌱");
+    eventMessageSpan.innerHTML = "✨ Nova jornada! Ande pela fazenda com as setas! ✨";
     
-    // Reset mensagem
-    eventMessage.innerHTML = "✨ Escolha sua ação do dia! ✨";
-    
-    // Mostra tela de jogo
-    startScreen.classList.remove("active");
-    gameOverScreen.classList.remove("active");
-    winScreen.classList.remove("active");
-    gameScreen.classList.add("active");
+    document.getElementById("charSelectScreen").classList.remove("active");
+    document.getElementById("gameOverScreen").classList.remove("active");
+    document.getElementById("winScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
 }
 
-// INICIALIZAR JOGO
+// ========== INICIALIZAÇÃO ==========
 function init() {
-    // Captura elementos DOM
-    startScreen = document.getElementById("startScreen");
-    gameScreen = document.getElementById("gameScreen");
-    gameOverScreen = document.getElementById("gameOverScreen");
-    winScreen = document.getElementById("winScreen");
-    
+    // DOM
+    charSprite = document.getElementById("charSprite");
+    charNameDisplay = document.getElementById("charNameDisplay");
+    playerNameTag = document.getElementById("playerNameTag");
+    talkAvatar = document.getElementById("talkAvatar");
     prodValue = document.getElementById("prodValue");
     envValue = document.getElementById("envValue");
     moneyValue = document.getElementById("moneyValue");
     dayCounter = document.getElementById("dayCounter");
     scoreValue = document.getElementById("scoreValue");
-    
-    prodFill = document.getElementById("prodFill");
-    envFill = document.getElementById("envFill");
-    moneyFill = document.getElementById("moneyFill");
-    
-    eventMessage = document.getElementById("eventMessage");
+    eventMessageSpan = document.getElementById("eventMessage");
     historyList = document.getElementById("historyList");
+    characterSpeech = document.getElementById("characterSpeech");
+    posXSpan = document.getElementById("posX");
+    posYSpan = document.getElementById("posY");
     
-    // Botões de ação
-    const actionButtons = document.querySelectorAll("[data-action]");
-    actionButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const action = btn.getAttribute("data-action");
-            executarAcao(action);
+    // Seleção de personagem
+    const charCards = document.querySelectorAll(".char-card");
+    charCards.forEach(card => {
+        card.addEventListener("click", () => {
+            charCards.forEach(c => c.classList.remove("selected"));
+            card.classList.add("selected");
+            const char = card.getAttribute("data-char");
+            setCharacter(char);
         });
     });
     
-    // Botões de controle
-    document.getElementById("startGameBtn").addEventListener("click", () => reiniciarJogo());
+    // Confirmação
+    document.getElementById("confirmCharBtn").addEventListener("click", () => {
+        const nomeInput = document.getElementById("playerNameSelect");
+        if (nomeInput.value.trim() === "") {
+            alert("Digite seu nome para começar!");
+            return;
+        }
+        playerName = nomeInput.value.trim();
+        setCharacter(selectedChar);
+        reiniciarJogo();
+    });
+    
+    // Controles de movimento
+    document.getElementById("moveUp").addEventListener("click", () => mover(0, -1));
+    document.getElementById("moveDown").addEventListener("click", () => mover(0, 1));
+    document.getElementById("moveLeft").addEventListener("click", () => mover(-1, 0));
+    document.getElementById("moveRight").addEventListener("click", () => mover(1, 0));
+    
+    // Teclado (setas)
+    window.addEventListener("keydown", (e) => {
+        if (!document.getElementById("gameScreen").classList.contains("active")) return;
+        switch(e.key) {
+            case "ArrowUp": mover(0, -1); break;
+            case "ArrowDown": mover(0, 1); break;
+            case "ArrowLeft": mover(-1, 0); break;
+            case "ArrowRight": mover(1, 0); break;
+        }
+    });
+    
+    // Botões de reiniciar
     document.getElementById("restartGameBtn").addEventListener("click", () => reiniciarJogo());
     document.getElementById("playAgainBtn").addEventListener("click", () => reiniciarJogo());
     document.getElementById("playAgainWinBtn").addEventListener("click", () => reiniciarJogo());
     
-    // Inicializa valores
-    atualizarInterface();
+    // Seleção padrão
+    setCharacter("boy");
+    document.querySelector('[data-char="boy"]').classList.add("selected");
 }
 
-// Inicia tudo quando a página carregar
 window.addEventListener("DOMContentLoaded", init);
-    
