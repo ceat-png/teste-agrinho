@@ -290,4 +290,196 @@ function renderCompostItems() {
     area.innerHTML = "";
     
     compostGame.currentItems.forEach((item, index) => {
-        const div =
+        const div = document.createElement("div");
+        div.className = "compost-item";
+        div.innerHTML = `<span style="font-size:2rem">${item.emoji}</span><br>${item.name}`;
+        div.onclick = () => handleCompostClick(index);
+        area.appendChild(div);
+    });
+}
+
+function handleCompostClick(index) {
+    const item = compostGame.currentItems[index];
+    const isCorrect = item.type === "organico";
+    
+    if (isCorrect) {
+        compostGame.acertos++;
+        document.getElementById("acertosComp").textContent = compostGame.acertos;
+        document.getElementById("compostMessage").innerHTML = "✅ Correto! Este item pode ir para a composteira! ✅";
+        document.getElementById("compostMessage").style.background = "#c8e6c9";
+    } else {
+        compostGame.erros++;
+        document.getElementById("errosComp").textContent = compostGame.erros;
+        document.getElementById("compostMessage").innerHTML = "❌ Errado! Este item NÃO pode ir para a composteira. Coloque no lixo rejeitado. ❌";
+        document.getElementById("compostMessage").style.background = "#ffcdd2";
+    }
+    
+    // Remover item
+    compostGame.currentItems.splice(index, 1);
+    renderCompostItems();
+    
+    // Verificar se completou
+    if (compostGame.currentItems.length === 0 || compostGame.acertos >= 5) {
+        document.getElementById("compostMessage").innerHTML = `🎉 Excelente trabalho, ${playerName}! Você transformou resíduos orgânicos em adubo natural! 🎉`;
+        document.getElementById("nextToFase3Btn").style.display = "block";
+    }
+}
+
+// ========== FASE 3: PLANTANDO O FUTURO ==========
+function startFase3() {
+    const dialog = document.getElementById("fase3DialogText");
+    dialog.innerHTML = `${playerName}, graças às abelhas e à compostagem, agora podemos produzir alimentos de forma sustentável. Vamos plantar mudas e ajudar o campo a crescer!`;
+    
+    // Reset farm game
+    farmGame.spots = [
+        { planted: false, grown: false, type: null, name: null, emoji: null },
+        { planted: false, grown: false, type: null, name: null, emoji: null },
+        { planted: false, grown: false, type: null, name: null, emoji: null },
+        { planted: false, grown: false, type: null, name: null, emoji: null },
+        { planted: false, grown: false, type: null, name: null, emoji: null },
+        { planted: false, grown: false, type: null, name: null, emoji: null }
+    ];
+    farmGame.mudasCount = 0;
+    farmGame.regadas = 0;
+    
+    document.getElementById("mudasPlantadas").textContent = "0";
+    document.getElementById("regadasCount").textContent = "0";
+    document.getElementById("nextToFinalBtn").style.display = "none";
+    document.getElementById("plantMessage").innerHTML = "";
+    
+    renderPlantSpots();
+    enableSeedlings();
+    
+    // Botão de regar
+    document.getElementById("waterBtn").onclick = waterPlants;
+    
+    fase3Screen.classList.add("active");
+}
+
+function renderPlantSpots() {
+    const container = document.getElementById("plantSpots");
+    container.innerHTML = "";
+    
+    farmGame.spots.forEach((spot, index) => {
+        const div = document.createElement("div");
+        div.className = `plant-spot ${spot.planted ? "planted" : "empty"} ${spot.grown ? "grown" : ""}`;
+        
+        if (spot.planted) {
+            div.innerHTML = `<div class="plant-emoji">${spot.emoji}</div>
+                            <div class="plant-name">${spot.name}</div>
+                            ${spot.grown ? '<span style="font-size:0.7rem">🌱 CRESCIDO! 🌱</span>' : '<span style="font-size:0.7rem">💧 Precisa regar</span>'}`;
+        } else {
+            div.innerHTML = `<div class="plant-emoji">⬜</div>
+                            <div class="plant-name">Vazio</div>
+                            <span style="font-size:0.7rem">Clique para plantar</span>`;
+        }
+        
+        div.onclick = () => plantSeed(index);
+        container.appendChild(div);
+    });
+}
+
+function enableSeedlings() {
+    const seedlings = document.querySelectorAll(".seedling");
+    seedlings.forEach(seedling => {
+        seedling.onclick = () => {
+            const type = seedling.getAttribute("data-type");
+            const name = seedling.textContent;
+            selectSeedling(type, name);
+        };
+    });
+}
+
+let selectedSeedType = null;
+let selectedSeedName = null;
+
+function selectSeedling(type, name) {
+    selectedSeedType = type;
+    selectedSeedName = name;
+    document.getElementById("plantMessage").innerHTML = `🌱 Muda de ${name} selecionada! Clique em um espaço vazio para plantar. 🌱`;
+    document.getElementById("plantMessage").style.background = "#c8e6c9";
+}
+
+function plantSeed(index) {
+    if (!selectedSeedType) {
+        document.getElementById("plantMessage").innerHTML = "⚠️ Primeiro selecione uma muda! ⚠️";
+        document.getElementById("plantMessage").style.background = "#fff3e0";
+        return;
+    }
+    
+    if (farmGame.spots[index].planted) {
+        document.getElementById("plantMessage").innerHTML = "❌ Este espaço já está plantado! ❌";
+        return;
+    }
+    
+    // Plantar
+    const emojis = { tomate: "🍅", alface: "🥬", milho: "🌽" };
+    farmGame.spots[index] = {
+        planted: true,
+        grown: false,
+        type: selectedSeedType,
+        name: selectedSeedName,
+        emoji: emojis[selectedSeedType]
+    };
+    
+    farmGame.mudasCount++;
+    document.getElementById("mudasPlantadas").textContent = farmGame.mudasCount;
+    
+    selectedSeedType = null;
+    selectedSeedName = null;
+    
+    renderPlantSpots();
+    
+    document.getElementById("plantMessage").innerHTML = "✅ Muda plantada! Não esqueça de regar para crescer! ✅";
+}
+
+function waterPlants() {
+    let wateredCount = 0;
+    
+    farmGame.spots.forEach(spot => {
+        if (spot.planted && !spot.grown) {
+            spot.grown = true;
+            wateredCount++;
+        }
+    });
+    
+    farmGame.regadas += wateredCount;
+    document.getElementById("regadasCount").textContent = farmGame.regadas;
+    renderPlantSpots();
+    
+    if (wateredCount > 0) {
+        document.getElementById("plantMessage").innerHTML = `💧 ${wateredCount} planta(s) regada(s)! Agora estão crescendo forte! 💧`;
+    } else {
+        document.getElementById("plantMessage").innerHTML = "⚠️ Não há plantas para regar! Plante primeiro! ⚠️";
+    }
+    
+    // Verificar se completou
+    const allPlanted = farmGame.spots.every(spot => spot.planted);
+    const allGrown = farmGame.spots.every(spot => spot.grown);
+    
+    if (allPlanted && allGrown) {
+        document.getElementById("nextToFinalBtn").style.display = "block";
+        document.getElementById("plantMessage").innerHTML = `🎉 Parabéns, ${playerName}! Sua fazenda está produzindo! 🎉`;
+    }
+}
+
+// ========== TELA FINAL ==========
+function showFinal() {
+    finalScreen.classList.add("active");
+}
+
+function resetGame() {
+    // Resetar variáveis
+    beeGame.gameRunning = false;
+    if (beeGame.animationId) cancelAnimationFrame(beeGame.animationId);
+    
+    // Resetar inputs
+    document.getElementById("playerNameIntro").value = "";
+    
+    // Resetar visibilidade dos botões
+    document.getElementById("nextToFase2Btn").style.display = "none";
+    document.getElementById("nextToFase3Btn").style.display = "none";
+    document.getElementById("nextToFinalBtn").style.display = "none";
+}
+
+window.addEventListener("DOMContentLoaded", init);
