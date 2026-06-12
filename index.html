@@ -3,236 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🐝 AGRO FORTE - Missão Polinizadores 🌻</title>
+    <title>🐝 AGRO FORTE - Futuro Sustentável 🌱</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
 
-        <!-- ========== TELA 1: HISTÓRIA E APRESENTAÇÃO ========== -->
-        <div id="storyScreen" class="screen active">
-            <div class="story-content">
-                <div class="story-header">
-                    <div class="agro-logo">🌾 AGRO FORTE 🚜</div>
-                    <div class="agro-slogan">"O futuro sustentável começa no campo!"</div>
-                </div>
-                
-                <div class="story-text">
-                    <h2>📖 NOSSA HISTÓRIA</h2>
-                    <p>🌅 <strong>No coração do Brasil,</strong> existe uma fazenda modelo chamada <strong>AGRO FORTE</strong>.</p>
-                    <p>🐝 Aqui, as <strong>abelhas e outros polinizadores</strong> são os maiores tesouros. Elas garantem 75% da produção de alimentos do mundo!</p>
-                    <p>🗑️ Mas um problema apareceu: <strong>resíduos agrícolas</strong> (embalagens de defensivos, restos de colheita, plásticos) estão se acumulando e <strong>ameaçando os polinizadores</strong>.</p>
-                    <p>🌱 <strong>Você foi convidado(a) para ser o novo Gestor Ambiental da AGRO FORTE</strong>! Sua missão é <strong>reciclar os resíduos</strong> e <strong>proteger os polinizadores</strong> em 20 dias, antes que seja tarde demais!</p>
-                    <p>🏆 <strong>Objetivo:</strong> Coletar 500 pontos entre proteção de polinizadores e reciclagem!</p>
-                </div>
-
-                <div class="character-join">
-                    <h3>👤 QUEM É VOCÊ NESTA HISTÓRIA?</h3>
-                    <div class="name-input-story">
-                        <input type="text" id="storyPlayerName" placeholder="Digite seu nome..." maxlength="20">
-                        <button class="game-btn" id="startGameFromStory">🌱 COMEÇAR MISSÃO 🌱</button>
+        <!-- ========== TELA INICIAL (FASE 0 - APRESENTAÇÃO) ========== -->
+        <div id="introScreen" class="screen active">
+            <div class="intro-content">
+                <div class="felipe-intro">
+                    <div class="felipe-avatar">👦</div>
+                    <div class="felipe-bubble">
+                        <p id="introText1">Olá! Eu sou o Felipe!</p>
+                        <p id="introText2">Um Agro Forte depende do equilíbrio entre produção de alimentos e preservação do meio ambiente.</p>
+                        <p id="introText3">Como você se chama?</p>
                     </div>
                 </div>
-
-                <div class="story-footer">
-                    <p>💡 <strong>Sabia que?</strong> Abelhas polinizam 70% das culturas agrícolas. Sem elas, não teríamos frutas, vegetais e grãos!</p>
+                <div class="name-input-area">
+                    <input type="text" id="playerNameIntro" placeholder="Digite seu nome..." maxlength="20">
+                    <button class="game-btn" id="confirmNameBtn">🌱 CONTINUAR 🌱</button>
                 </div>
             </div>
         </div>
 
-        <!-- ========== TELA 2: ESCOLHA DO PERSONAGEM ========== -->
+        <!-- ========== TELA DE ESCOLHA DE PERSONAGEM ========== -->
         <div id="charSelectScreen" class="screen">
             <div class="select-container">
-                <h1>👨‍🌾 ESCOLHA SEU ESTILO 👩‍🌾</h1>
-                <p>Como você quer ser chamado na história?</p>
+                <div class="felipe-message">
+                    <div class="felipe-avatar-small">👦</div>
+                    <div class="message-bubble">
+                        <p id="charSelectMsg">Prazer em conhecer você, <span id="displayName">...</span>!</p>
+                        <p>Hoje vamos aprender como pequenas ações ajudam a construir um futuro sustentável.</p>
+                        <p>Primeiro escolha seu personagem!</p>
+                    </div>
+                </div>
                 <div class="char-options">
                     <div class="char-card" data-char="boy">
-                        <div class="char-avatar boy-avatar">👨‍🌾</div>
-                        <h3>ESTILO FAZENDEIRO</h3>
-                        <p>Camisa xadrez, chapéu e muita determinação!</p>
+                        <div class="char-avatar">👦</div>
+                        <h3>Menino</h3>
+                        <p>Fazendeiro aprendiz</p>
                     </div>
                     <div class="char-card" data-char="girl">
-                        <div class="char-avatar girl-avatar">👩‍🌾</div>
-                        <h3>ESTILO GUARDIÃ</h3>
-                        <p>Macacão, luvas e amor pela natureza!</p>
+                        <div class="char-avatar">👧</div>
+                        <h3>Menina</h3>
+                        <p>Guardiã da natureza</p>
                     </div>
                 </div>
-                <button class="game-btn" id="confirmCharBtn">🌾 CONFIRMAR 🌾</button>
+                <button class="game-btn" id="startFase1Btn">🐝 COMEÇAR MISSÃO 🐝</button>
             </div>
         </div>
 
-        <!-- ========== TELA 3: JOGO PRINCIPAL ========== -->
-        <div id="gameScreen" class="screen">
-            <!-- BARRA SUPERIOR -->
-            <div class="top-bar">
-                <div class="player-card">
-                    <span class="player-avatar" id="playerAvatar">👨‍🌾</span>
-                    <div class="player-info-text">
-                        <div id="playerNameGame" class="player-name-game">Fazendeiro(a)</div>
-                        <div class="player-title">🌱 Gestor Ambiental</div>
-                    </div>
+        <!-- ========== FASE 1 - SALVANDO OS POLINIZADORES ========== -->
+        <div id="fase1Screen" class="screen">
+            <div class="phase-header">
+                <h1>🐝 FASE 1: Salvando os Polinizadores</h1>
+                <div class="phase-stats">
+                    <span>🌸 Flores: <span id="floresColetadas">0</span> / 10</span>
+                    <span>💨 Colisões: <span id="colisoesCount">0</span></span>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-badge">🐝 <span id="beeValue">50</span>%</div>
-                    <div class="stat-badge">♻️ <span id="recycleValue">50</span>%</div>
-                    <div class="stat-badge">📅 <span id="dayCounter">1</span>/20</div>
-                    <div class="stat-badge">🏆 <span id="scoreValue">0</span> pts</div>
+            </div>
+            
+            <div class="felipe-dialog" id="fase1Dialog">
+                <div class="felipe-avatar-small">👦</div>
+                <div class="dialog-bubble">
+                    <p id="fase1DialogText">Carregando missão...</p>
                 </div>
             </div>
 
-            <!-- HISTÓRIA RESUMIDA (contexto do jogo) -->
-            <div class="mission-board">
-                <div class="mission-text">
-                    🎯 <strong id="missionText">Missão: Proteja os polinizadores e recicle os resíduos!</strong>
+            <div class="game-canvas-container">
+                <canvas id="beeGameCanvas" width="800" height="400"></canvas>
+                <div class="game-controls">
+                    <p>🎮 Use as setas ↑ e ↓ para controlar a abelha!</p>
+                    <p>🌸 Colete as flores - 💨 Desvie da fumaça e do fogo!</p>
                 </div>
             </div>
 
-            <!-- ÁREA PRINCIPAL: DESAFIOS -->
-            <div class="challenges-area">
-                <div class="challenge-column polinizadores">
-                    <div class="challenge-header">
-                        <span class="challenge-icon">🐝</span>
-                        <h2>PROTEÇÃO DOS POLINIZADORES</h2>
-                    </div>
-                    <div class="challenge-status">
-                        <div class="status-bar">
-                            <div class="status-fill bee-fill" id="beeFill"></div>
-                        </div>
-                        <p>Nível atual: <span id="beeLevel">50</span>%</p>
-                    </div>
-                    <div class="challenge-actions">
-                        <button class="action-card" data-type="bee" data-action="plantarFlores">
-                            <span class="action-icon">🌻</span>
-                            <div>
-                                <strong>Plantar Flores Nativas</strong>
-                                <small>+15% polinizadores, +10 pontos</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="bee" data-action="criarAbelhas">
-                            <span class="action-icon">🏠</span>
-                            <div>
-                                <strong>Instalar Caixas de Abelhas</strong>
-                                <small>+20% polinizadores, -10% dinheiro, +15 pts</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="bee" data-action="pararAgrotoxico">
-                            <span class="action-icon">🚫</span>
-                            <div>
-                                <strong>Reduzir Agrotóxicos</strong>
-                                <small>+25% polinizadores, -20% produção, +20 pts</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="bee" data-action="corredorEcologico">
-                            <span class="action-icon">🌿</span>
-                            <div>
-                                <strong>Criar Corredor Ecológico</strong>
-                                <small>+30% polinizadores, -5% dinheiro, +25 pts</small>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="challenge-column residuos">
-                    <div class="challenge-header">
-                        <span class="challenge-icon">♻️</span>
-                        <h2>RECICLAGEM DE RESÍDUOS</h2>
-                    </div>
-                    <div class="challenge-status">
-                        <div class="status-bar">
-                            <div class="status-fill recycle-fill" id="recycleFill"></div>
-                        </div>
-                        <p>Nível atual: <span id="recycleLevel">50</span>%</p>
-                    </div>
-                    <div class="challenge-actions">
-                        <button class="action-card" data-type="recycle" data-action="coletaSeletiva">
-                            <span class="action-icon">🗑️</span>
-                            <div>
-                                <strong>Coleta Seletiva</strong>
-                                <small>+15% reciclagem, +10 pontos</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="recycle" data-action="compostagem">
-                            <span class="action-icon">🍂</span>
-                            <div>
-                                <strong>Compostagem de Restos</strong>
-                                <small>+20% reciclagem, +10 pts, +5% solo</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="recycle" data-action="reaproveitarEmbalagens">
-                            <span class="action-icon">📦</span>
-                            <div>
-                                <strong>Reaproveitar Embalagens</strong>
-                                <small>+15% reciclagem, +5% dinheiro, +12 pts</small>
-                            </div>
-                        </button>
-                        <button class="action-card" data-type="recycle" data-action="bioenergia">
-                            <span class="action-icon">⚡</span>
-                            <div>
-                                <strong>Bioenergia com Resíduos</strong>
-                                <small>+25% reciclagem, +15% dinheiro, +20 pts</small>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAINEL DE EVENTOS E HISTÓRICO -->
-            <div class="events-panel">
-                <div class="event-box">
-                    <strong>📢 EVENTO DO DIA:</strong>
-                    <p id="eventMessage">🌅 Comece sua missão! Escolha ações para proteger as abelhas e reciclar resíduos!</p>
-                </div>
-                <div class="history-box">
-                    <strong>📋 HISTÓRICO DE AÇÕES:</strong>
-                    <div id="historyList" class="history-scroll"></div>
-                </div>
-            </div>
-
-            <!-- PERSONAGEM FALANTE -->
-            <div class="character-talker">
-                <div class="talker-avatar" id="talkerAvatar">👨‍🌾</div>
-                <div class="talker-bubble">
-                    <p id="talkerSpeech">Olá <span id="talkerPlayerName">Fazendeiro</span>! Vamos juntos salvar os polinizadores e tornar o Agro Forte ainda mais sustentável! 🌱🐝</p>
-                </div>
-            </div>
-
-            <button class="restart-btn" id="restartGameBtn">🔄 REINICIAR JORNADA</button>
+            <button class="next-phase-btn" id="nextToFase2Btn" style="display: none;">♻️ PRÓXIMA FASE - COMPOSTAGEM ♻️</button>
         </div>
 
-        <!-- ========== TELA 4: VITÓRIA ========== -->
-        <div id="winScreen" class="screen">
-            <div class="end-screen">
-                <div class="celebration">🏆🎉🐝🎉🏆</div>
-                <h1>MISSÃO CUMPRIDA!</h1>
-                <div class="victory-message">
-                    <p>🌟 <strong id="winPlayerName">Fazendeiro(a)</strong>, você salvou os polinizadores!</p>
-                    <p>🌻 As abelhas estão felizes, os resíduos foram reciclados e o <strong>AGRO FORTE</strong> se tornou referência em sustentabilidade!</p>
-                    <p>🚜 O equilíbrio entre produção e meio ambiente é real. Parabéns!</p>
+        <!-- ========== FASE 2 - COMPOSTAGEM ========== -->
+        <div id="fase2Screen" class="screen">
+            <div class="phase-header">
+                <h1>♻️ FASE 2: Compostagem</h1>
+                <div class="phase-stats">
+                    <span>✅ Acertos: <span id="acertosComp">0</span></span>
+                    <span>❌ Erros: <span id="errosComp">0</span></span>
                 </div>
-                <div class="final-stats">
-                    <p>🐝 Proteção dos Polinizadores: <strong id="winBee">0</strong>%</p>
-                    <p>♻️ Reciclagem de Resíduos: <strong id="winRecycle">0</strong>%</p>
-                    <p>🏆 Pontuação Final: <strong id="winScore">0</strong></p>
+            </div>
+
+            <div class="felipe-dialog">
+                <div class="felipe-avatar-small">👦</div>
+                <div class="dialog-bubble">
+                    <p id="fase2DialogText">Agora vamos aprender sobre compostagem! Restos de frutas, verduras e folhas podem virar adubo natural. Arraste os itens corretos para a composteira!</p>
                 </div>
-                <button class="game-btn" id="playAgainBtn">🌱 JOGAR NOVAMENTE 🌱</button>
+            </div>
+
+            <div class="compost-game">
+                <div class="items-area" id="itemsArea">
+                    <!-- Itens serão gerados via JS -->
+                </div>
+                <div class="composteira-area">
+                    <div class="composteira">🗑️ COMPOSTEIRA<br>🌱</div>
+                    <div class="lixeira" id="lixeira">❌ LIXO REJEITADO</div>
+                </div>
+            </div>
+
+            <div class="compost-message" id="compostMessage"></div>
+            <button class="next-phase-btn" id="nextToFase3Btn" style="display: none;">🌱 PRÓXIMA FASE - PLANTANDO O FUTURO 🌱</button>
+        </div>
+
+        <!-- ========== FASE 3 - PLANTANDO O FUTURO ========== -->
+        <div id="fase3Screen" class="screen">
+            <div class="phase-header">
+                <h1>🌱 FASE 3: Plantando o Futuro</h1>
+                <div class="phase-stats">
+                    <span>🌱 Mudas plantadas: <span id="mudasPlantadas">0</span> / 6</span>
+                    <span>💧 Regadas: <span id="regadasCount">0</span></span>
+                </div>
+            </div>
+
+            <div class="felipe-dialog">
+                <div class="felipe-avatar-small">👦</div>
+                <div class="dialog-bubble">
+                    <p id="fase3DialogText">Graças às abelhas e à compostagem, agora podemos produzir alimentos de forma sustentável! Vamos plantar mudas e ajudar o campo a crescer!</p>
+                </div>
+            </div>
+
+            <div class="farm-area">
+                <div class="plant-spots" id="plantSpots">
+                    <!-- 6 espaços para plantar -->
+                </div>
+                <div class="seedlings-area">
+                    <h3>🌱 MUDAS DISPONÍVEIS</h3>
+                    <div class="seedlings" id="seedlings">
+                        <div class="seedling" data-type="tomate">🍅 Muda de Tomate</div>
+                        <div class="seedling" data-type="alface">🥬 Muda de Alface</div>
+                        <div class="seedling" data-type="milho">🌽 Muda de Milho</div>
+                        <div class="seedling" data-type="tomate">🍅 Muda de Tomate</div>
+                        <div class="seedling" data-type="alface">🥬 Muda de Alface</div>
+                        <div class="seedling" data-type="milho">🌽 Muda de Milho</div>
+                    </div>
+                </div>
+                <div class="watering-can">
+                    <button id="waterBtn" class="action-water">💧 REGAR PLANTAS 💧</button>
+                </div>
+            </div>
+
+            <div class="plant-message" id="plantMessage"></div>
+            <button class="next-phase-btn" id="nextToFinalBtn" style="display: none;">🏆 FINALIZAR MISSÃO 🏆</button>
+        </div>
+
+        <!-- ========== TELA FINAL ========== -->
+        <div id="finalScreen" class="screen">
+            <div class="final-content">
+                <div class="sustainable-farm">
+                    <div class="farm-scene">🌳🐝🌱🚜🌻</div>
+                    <h1>AGRO FORTE, FUTURO SUSTENTÁVEL</h1>
+                </div>
+                
+                <div class="felipe-final">
+                    <div class="felipe-avatar-large">👦</div>
+                    <div class="final-bubble">
+                        <p id="finalMessage"><span id="finalPlayerName">...</span>, lembre-se:</p>
+                        <p>Produzir alimentos e preservar a natureza devem caminhar juntos.</p>
+                        <p>Quando cuidamos do meio ambiente, garantimos um futuro melhor para todos!</p>
+                    </div>
+                </div>
+
+                <button class="game-btn" id="playAgainBtn">🔄 JOGAR NOVAMENTE 🔄</button>
             </div>
         </div>
 
-        <!-- ========== TELA 5: GAME OVER ========== -->
-        <div id="gameOverScreen" class="screen">
-            <div class="end-screen">
-                <div class="sad-celebration">😔💔😭</div>
-                <h1>FIM DE JOGO</h1>
-                <p id="gameOverMsg"></p>
-                <div class="final-stats">
-                    <p>🐝 Polinizadores: <strong id="gameOverBee">0</strong>%</p>
-                    <p>♻️ Reciclagem: <strong id="gameOverRecycle">0</strong>%</p>
-                    <p>🏆 Pontuação: <strong id="gameOverScore">0</strong></p>
-                </div>
-                <button class="game-btn" id="playAgainGameOverBtn">🌱 TENTAR NOVAMENTE 🌱</button>
-            </div>
-        </div>
     </div>
 
     <script src="script.js"></script>
