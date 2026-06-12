@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Agro Forte | Futuro Sustentável</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- CABEÇALHO COM NAVEGAÇÃO -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <h1>🌱 Agro Forte</h1>
+                    <p>futuro sustentável · equilíbrio verde</p>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#praticas">Práticas</a></li>
+                    <li><a href="#impacto">Seu Impacto</a></li>
+                    <li><a href="#contato">Reflorestar</a></li>
+                </ul>
+                <button class="darkmode-toggle" id="darkModeToggle">🌓 Dark Mode</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+        <!-- SEÇÃO HERO (HOME) -->
+        <section id="home" class="hero">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h2>Produzir alimentando <span class="highlight">o amanhã</span></h2>
+                    <p><strong>Agro forte, futuro sustentável</strong> é mais que um lema: é unir tecnologia, respeito à terra e produtividade. Cada decisão de hoje fortalece o equilíbrio entre produção agrícola e meio ambiente.</p>
+                    <div class="btn-group">
+                        <button class="btn" id="saibaBtn">🌾 Descubra como</button>
+                        <a href="#impacto" class="btn btn-outline">📊 Calcular impacto</a>
+                    </div>
+                </div>
+                <div class="hero-img">
+                    <!-- SVG ilustrativo personalizado (Canva/SVG autoral) -->
+                    <svg width="280" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="90" cy="120" r="28" fill="#4c9f70" fill-opacity="0.3" stroke="#2b7a4b" stroke-width="2"/>
+                        <circle cx="210" cy="100" r="35" fill="#62c28b" fill-opacity="0.5" stroke="#2b7a4b" stroke-width="2"/>
+                        <path d="M150 180 L120 140 L180 140 L150 180Z" fill="#D9B48B" stroke="#A67B5B" stroke-width="2"/>
+                        <rect x="140" y="120" width="20" height="20" fill="#A2D9A2" stroke="#2b7a4b" stroke-width="1.5"/>
+                        <text x="15" y="190" fill="#2b7a4b" font-size="12">🌿 integração lavoura-pecuária</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- SEÇÃO: PRÁTICAS SUSTENTÁVEIS -->
+            <section id="praticas">
+                <h2 class="section-title">🌿 Pilares da Sustentabilidade</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon">🌾</div>
+                        <h3>Plantio Direto</h3>
+                        <p>Conservação do solo, reduz erosão e aumenta matéria orgânica. Produção aliada à saúde do planeta.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💧</div>
+                        <h3>Uso Racional da Água</h3>
+                        <p>Reuso e irrigação eficiente garantem safras sem desperdício, protegendo os recursos hídricos.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🌳</div>
+                        <h3>Integração Lavoura-Pecuária-Floresta</h3>
+                        <p>Sistemas que regeneram áreas, sequestram carbono e aumentam a produtividade por hectare.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Energia Limpa no Campo</h3>
+                        <p>Biogás, solar e eficiência energética reduzem emissões e trazem independência ao produtor.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO INTERATIVA: CÁLCULO DE IMPACTO E CONTADOR -->
+            <section id="impacto">
+                <h2 class="section-title">📈 Seu impacto positivo começa aqui</h2>
+                <div class="form-box">
+                    <h3>🤝 Calcule a economia de CO₂ com práticas sustentáveis</h3>
+                    
+                    <!-- FORMULÁRIO COM INPUT E SELECT -->
+                    <div class="form-group">
+                        <label for="hectares">🌽 Área de produção (hectares):</label>
+                        <input type="number" id="hectares" placeholder="Ex: 50" value="30">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pratica">🌱 Prática adotada:</label>
+                        <select id="pratica">
+                            <option value="6.5">Plantio Direto + rotação de culturas</option>
+                            <option value="4.2">Sistema ILPF (integração floresta)</option>
+                            <option value="3.0">Irrigação sustentável + reuso</option>
+                            <option value="8.1">Recuperação de pastagem + biomassa</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" id="calcImpactoBtn">🌎 Calcular redução de CO₂</button>
+                    
+                    <!-- RESULTADO DINÂMICO (alterado via JS) -->
+                    <div id="resultadoCO2" class="eco-feedback">
+                        💡 Clique em calcular e veja o quanto você contribui com o clima!
+                    </div>
+
+                    <!-- CONTADOR DE ÁRVORES (interação com botões) -->
+                    <div class="contador-area">
+                        <span>🌳 Meta de reflorestamento: cada clique = 1 árvore plantada simbólica</span>
+                        <div class="contador-box">
+                            <button id="decrementArvore">-</button>
+                            <span id="arvoreCounter">0</span>
+                            <button id="incrementArvore">+</button>
+                        </div>
+                        <span id="msgArvore" style="font-size:0.9rem;">Plante esperança!</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO FORMULÁRIO DE CONTATO / SAUDAÇÃO PERSONALIZADA -->
+            <section id="contato">
+                <h2 class="section-title">🌻 Faça parte da rede agro sustentável</h2>
+                <div class="form-box">
+                    <h3>Cadastre seu nome e receba dicas exclusivas</h3>
+                    
+                    <div class="form-group">
+                        <label for="nomeUsuario">Seu nome:</label>
+                        <input type="text" id="nomeUsuario" placeholder="Ex: Ana Silva">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailUser">E-mail (opcional):</label>
+                        <input type="email" id="emailUser" placeholder="voce@exemplo.com">
+                    </div>
+                    
+                    <button class="btn" id="saudacaoBtn">✨ Enviar e receber saudação</button>
+                    
+                    <!-- Espaço para mensagem personalizada com o nome -->
+                    <div id="mensagemPersonalizada" class="eco-feedback" style="margin-top: 1rem;">
+                        👋 Diga olá para o Agro Forte!
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+        <p>🌍 Agro Forte, futuro sustentável — equilíbrio entre produção agrícola e meio ambiente.</p>
+        <p>Projeto desenvolvido para Agrinho · Código autoral · HTML, CSS e JavaScript puro 🌱</p>
+        <p>📌 Mídias customizadas: Canva (ícones conceituais) e ilustração SVG autoral · 2025</p>
+        <p id="dataAtualFooter"></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
