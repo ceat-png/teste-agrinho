@@ -3,160 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🌾 Agro Forte - O Desafio Sustentável</title>
+    <title>🌾 AGRO FORTE - Aventura Sustentável 🌿</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="game-container">
-        <!-- TELA INICIAL -->
-        <div id="startScreen" class="screen active">
-            <div class="game-title">
-                <h1>🌾 AGRO FORTE 🌿</h1>
-                <h2>O Desafio Sustentável</h2>
-                <p>Equilibre produção e meio ambiente para vencer!</p>
-                <button class="game-btn" id="startGameBtn">🌱 INICIAR JOGO 🌱</button>
-                <div class="instructions">
-                    <h3>📜 COMO JOGAR:</h3>
-                    <p>🎯 Objetivo: Alcançar 1000 pontos de sustentabilidade em 30 dias</p>
-                    <p>⚡ Decisões afetam: Produção 🌽 | Meio Ambiente 🌳 | Dinheiro 💰</p>
-                    <p>⚠️ Se dinheiro ou ambiente zerarem → GAME OVER!</p>
-                    <p>🎮 Use os botões de ação para administrar sua fazenda</p>
+    <div class="game-wrapper">
+        <!-- TELA DE ESCOLHA DE PERSONAGEM -->
+        <div id="charSelectScreen" class="screen active">
+            <div class="select-container">
+                <h1>🌾 ESCOLHA SEU PERSONAGEM 🌿</h1>
+                <div class="char-options">
+                    <div class="char-card" data-char="boy">
+                        <div class="char-avatar boy-avatar">👨‍🌾</div>
+                        <h3>LUCAS</h3>
+                        <p>O fazendeiro corajoso</p>
+                        <p>"Vamos colher um futuro melhor!"</p>
+                    </div>
+                    <div class="char-card" data-char="girl">
+                        <div class="char-avatar girl-avatar">👩‍🌾</div>
+                        <h3>SOFIA</h3>
+                        <p>A guardiã da natureza</p>
+                        <p>"Cuidar da terra é cuidar da vida!"</p>
+                    </div>
+                </div>
+                <div class="name-area">
+                    <input type="text" id="playerNameSelect" placeholder="Seu nome..." maxlength="15">
+                    <button class="game-btn" id="confirmCharBtn">🌱 COMEÇAR AVENTURA 🌱</button>
                 </div>
             </div>
         </div>
 
         <!-- TELA DO JOGO PRINCIPAL -->
         <div id="gameScreen" class="screen">
-            <!-- HEADER DO JOGO -->
-            <div class="game-header">
-                <div class="stats">
-                    <div class="stat-card">
-                        <span class="stat-icon">🌽</span>
-                        <span class="stat-label">Produção</span>
-                        <span class="stat-value" id="prodValue">500</span>
+            <!-- BARRA SUPERIOR -->
+            <div class="top-bar">
+                <div class="player-info">
+                    <div class="character-display">
+                        <span id="charSprite">👨‍🌾</span>
+                        <span id="charNameDisplay">Lucas</span>
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">🌳</span>
-                        <span class="stat-label">Meio Ambiente</span>
-                        <span class="stat-value" id="envValue">500</span>
+                    <div class="player-name" id="playerNameTag">Jogador</div>
+                </div>
+                <div class="stats-mini">
+                    <div class="stat-mini">🌽 <span id="prodValue">500</span></div>
+                    <div class="stat-mini">🌳 <span id="envValue">500</span></div>
+                    <div class="stat-mini">💰 <span id="moneyValue">5000</span></div>
+                    <div class="stat-mini">📅 <span id="dayCounter">1</span>/30</div>
+                    <div class="stat-mini">🏆 <span id="scoreValue">0</span></div>
+                </div>
+            </div>
+
+            <!-- ÁREA DO MAPA (ONDE O PERSONAGEM ANDA) -->
+            <div class="game-area">
+                <div class="map-container">
+                    <div class="map-grid" id="mapGrid">
+                        <!-- Mapa 5x5 gerado via JS -->
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">💰</span>
-                        <span class="stat-label">Dinheiro</span>
-                        <span class="stat-value" id="moneyValue">5000</span>
+                    <div class="map-controls">
+                        <div class="control-buttons">
+                            <button id="moveUp">⬆️</button>
+                            <div>
+                                <button id="moveLeft">⬅️</button>
+                                <button id="moveDown">⬇️</button>
+                                <button id="moveRight">➡️</button>
+                            </div>
+                        </div>
+                        <div class="position-info">
+                            📍 Posição: <span id="posX">2</span>, <span id="posY">2</span>
+                        </div>
                     </div>
                 </div>
-                <div class="game-info">
-                    <div class="day-counter">
-                        📅 Dia <span id="dayCounter">1</span> / 30
+
+                <!-- PAINEL DO PERSONAGEM (FALA) -->
+                <div class="character-panel">
+                    <div class="char-talk">
+                        <div class="talk-avatar" id="talkAvatar">👨‍🌾</div>
+                        <div class="talk-bubble">
+                            <p id="characterSpeech">Olá! Use as setas ou botões para andar pela fazenda!</p>
+                        </div>
                     </div>
-                    <div class="score">
-                        🏆 Sustentabilidade: <span id="scoreValue">0</span>
+                </div>
+
+                <!-- PAINEL DE AÇÃO (muda conforme a área) -->
+                <div class="action-panel">
+                    <h3 id="areaTitle">🌾 Área: Plantação</h3>
+                    <p id="areaDesc">Aqui você pode plantar e colher!</p>
+                    <div class="area-actions" id="areaActions">
+                        <button class="action-btn" data-action="plantioDireto">🌾 Plantar</button>
+                        <button class="action-btn" data-action="colher">💰 Colher</button>
                     </div>
                 </div>
             </div>
 
-            <!-- PROGRESS BARS -->
-            <div class="progress-bars">
-                <div class="progress-bar-container">
-                    <div class="progress-label">🌽 Produção</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill prod-fill" id="prodFill"></div>
-                    </div>
+            <!-- HISTÓRICO E EVENTOS -->
+            <div class="bottom-panel">
+                <div class="event-log">
+                    <strong>📢 Evento:</strong> <span id="eventMessage">Ande pela fazenda para descobrir!</span>
                 </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">🌳 Meio Ambiente</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill env-fill" id="envFill"></div>
-                    </div>
+                <div class="history-log">
+                    <strong>📋 Histórico:</strong>
+                    <div id="historyList" class="history-scroll"></div>
                 </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">💰 Dinheiro</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill money-fill" id="moneyFill"></div>
-                    </div>
-                </div>
+                <button class="restart-btn" id="restartGameBtn">🔄 Reiniciar Jornada</button>
             </div>
-
-            <!-- EVENTO DO DIA (MENSAGEM) -->
-            <div class="event-area" id="eventArea">
-                <p id="eventMessage">✨ Escolha sua ação do dia! ✨</p>
-            </div>
-
-            <!-- BOTÕES DE AÇÃO (ESCOLHAS DO JOGADOR) -->
-            <div class="actions-grid">
-                <button class="action-btn" data-action="plantioDireto">
-                    <span class="action-icon">🌾</span>
-                    <span class="action-name">Plantio Direto</span>
-                    <span class="action-desc">+Produção +Ambiente</span>
-                </button>
-                <button class="action-btn" data-action="desmatamento">
-                    <span class="action-icon">🪓</span>
-                    <span class="action-name">Desmatamento</span>
-                    <span class="action-desc">++💰 --Ambiente</span>
-                </button>
-                <button class="action-btn" data-action="reflorestamento">
-                    <span class="action-icon">🌳</span>
-                    <span class="action-name">Reflorestamento</span>
-                    <span class="action-desc">++Ambiente -💰</span>
-                </button>
-                <button class="action-btn" data-action="tecnologiaVerde">
-                    <span class="action-icon">💡</span>
-                    <span class="action-name">Tecnologia Verde</span>
-                    <span class="action-desc">++Prod ++Amb --💰</span>
-                </button>
-                <button class="action-btn" data-action="agrotoxico">
-                    <span class="action-icon">🧪</span>
-                    <span class="action-name">Agrotóxico</span>
-                    <span class="action-desc">+Prod --Amb +💰</span>
-                </button>
-                <button class="action-btn" data-action="feiraOrganica">
-                    <span class="action-icon">🛒</span>
-                    <span class="action-name">Feira Orgânica</span>
-                    <span class="action-desc">+Amb +💰 -Prod</span>
-                </button>
-            </div>
-
-            <!-- HISTÓRICO DE AÇÕES -->
-            <div class="history-panel">
-                <h3>📋 Histórico de Decisões</h3>
-                <div id="historyList" class="history-list">
-                    <p>✨ Nenhuma ação ainda. Comece a jogar!</p>
-                </div>
-            </div>
-
-            <!-- BOTÃO REINICIAR -->
-            <button class="restart-btn" id="restartGameBtn">🔄 Reiniciar Jogo</button>
         </div>
 
         <!-- TELA DE GAME OVER -->
         <div id="gameOverScreen" class="screen">
-            <div class="game-over-content">
+            <div class="end-screen">
+                <div class="end-char">😭<span id="gameOverChar">👨‍🌾</span>😭</div>
                 <h1>💀 GAME OVER 💀</h1>
                 <p id="gameOverMessage"></p>
                 <div class="final-stats">
-                    <p>🌽 Produção final: <span id="finalProd">0</span></p>
-                    <p>🌳 Ambiente final: <span id="finalEnv">0</span></p>
-                    <p>💰 Dinheiro final: <span id="finalMoney">0</span></p>
+                    <p>🌽 Produção: <span id="finalProd">0</span></p>
+                    <p>🌳 Ambiente: <span id="finalEnv">0</span></p>
+                    <p>💰 Dinheiro: <span id="finalMoney">0</span></p>
                     <p>🏆 Pontuação: <span id="finalScore">0</span></p>
                 </div>
-                <button class="game-btn" id="playAgainBtn">🌱 JOGAR NOVAMENTE 🌱</button>
+                <button class="game-btn" id="playAgainBtn">🌱 RECOMEÇAR 🌱</button>
             </div>
         </div>
 
         <!-- TELA DE VITÓRIA -->
         <div id="winScreen" class="screen">
-            <div class="win-content">
+            <div class="end-screen">
+                <div class="end-char">🎉<span id="winChar">👨‍🌾</span>🏆</div>
                 <h1>🏆 VITÓRIA! 🏆</h1>
-                <p>🌿 Você provou que é possível ter um AGRO FORTE e SUSTENTÁVEL!</p>
+                <p>🌿 Você equilibrou produção e meio ambiente!</p>
                 <div class="final-stats">
                     <p>🌽 Produção final: <span id="winProd">0</span></p>
                     <p>🌳 Ambiente final: <span id="winEnv">0</span></p>
                     <p>💰 Dinheiro final: <span id="winMoney">0</span></p>
-                    <p>🏆 Pontuação final: <span id="winScore">0</span></p>
+                    <p>🏆 Pontuação: <span id="winScore">0</span></p>
                 </div>
-                <button class="game-btn" id="playAgainWinBtn">🌱 JOGAR NOVAMENTE 🌱</button>
+                <button class="game-btn" id="playAgainWinBtn">🌱 NOVA AVENTURA 🌱</button>
             </div>
         </div>
     </div>
